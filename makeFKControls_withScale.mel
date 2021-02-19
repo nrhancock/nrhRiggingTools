@@ -1,0 +1,192 @@
+global proc makeFKTRS ()
+{
+	// sets up FK controls to a joint chain of any size
+	// usage: makeFKTRS (requires makeFK UI)
+	
+	// capturing variables
+	
+	$selection = `ls -sl`;
+	int $size = `size ($selection)`;
+	float $controlSize = `floatSliderGrp -q -v controlSize`;
+	$color = `colorIndexSliderGrp -q -v controlColor`;
+	$color = $color - 1;
+	// looping
+	for ($i=0; $i<$size; $i++)
+		{
+		 
+		string $controlName;
+	    if ($size == 1)
+	    {
+	    $controlName = `textFieldGrp -q -text controlName`;
+	    if (`objExists $controlName` == 1)
+	    error "Please specify a unique name.";
+    	}
+	    else
+	    $controlName = ($selection[$i]+"_CTRL");
+	    
+		// creating gyro controller object
+		$circle1 =`circle -nr 1 0 0 -ch 0`;
+		$circleShape1 = `pickWalk -d down`;
+		$circle2 =`circle -nr 0 1 0 -ch 0`;
+		$circleShape2 = `pickWalk -d down`;
+		$circle3 =`circle -nr 0 0 1 -ch 0`;
+		$circleShape3 = `pickWalk -d down`;
+		
+		setAttr ($circleShape1[0] + ".overrideEnabled") 1;
+		setAttr ($circleShape2[0] + ".overrideEnabled") 1;
+		setAttr ($circleShape3[0] + ".overrideEnabled") 1;
+		
+		setAttr ($circleShape1[0] + ".overrideColor") $color ;
+		setAttr ($circleShape2[0] + ".overrideColor") $color ;
+		setAttr ($circleShape3[0] + ".overrideColor") $color ;
+		
+		parent -shape -r $circleShape3 $circleShape2 $circle1[0];
+		delete $circle2[0];
+		delete $circle3[0];
+		print "-----";
+		print $controlName;
+		rename $circle1[0] $controlName;
+		select $controlName;
+		scale -r ($controlSize *.25) ($controlSize *.25) ($controlSize *.25);
+		makeIdentity -apply true -t 1 -r 1 -s 1 -n 0;
+		
+		// creating offset node
+		group -em -n ($selection[$i]+"_offset");
+		$tempConstraint = `orientConstraint $selection[$i] ($selection[$i]+"_offset")`;
+		delete $tempConstraint;
+		$tempConstraint = `pointConstraint $selection[$i] ($selection[$i]+"_offset")`;
+		delete $tempConstraint;
+
+		parent $controlName ($selection[$i]+"_offset");
+		
+		// parenting all subsequent controls to the appropriate parent control
+		if ($i>=1)
+			parent ($selection[$i]+"_offset")  ($selection[$i-1]+"_CTRL");
+		
+		// setting attributes to zero
+		setAttr ($controlName+".tx") 0;
+		setAttr ($controlName+".ty") 0;
+		setAttr ($controlName+".tz") 0;
+		
+		setAttr ($controlName+".rx") 0;
+		setAttr ($controlName+".ry") 0;
+		setAttr ($controlName+".rz") 0;
+		
+		setAttr ($controlName+".sx") 1;
+		setAttr ($controlName+".sy") 1;
+		setAttr ($controlName+".sz") 1;
+		
+		// connecting FK controls directly to joint rotations
+		parentConstraint -mo $controlName ($selection[$i])  ;
+		scaleConstraint -mo $controlName ($selection[$i])  ;
+
+		
+		// point constrain the controller objects to the actual joints so that the move properly
+		// when joints scale/stretch
+		//pointConstraint $selection[$i] ($selection[$i]+"Control_Offset") ;
+		}
+	
+}
+
+
+
+global proc reloadFKUI()
+{
+	$sel = `ls -sl`;
+	if (`size ($sel)` == 0)
+	{
+	print "Please select object(s) to control.";
+	textFieldGrp -e -text "Select object(s) to control" -editable false controlName;
+	}
+	else if (`size ($sel)` == 1)
+	{
+	string $newText = $sel[0];
+	textFieldGrp -e -text ($newText+"_CTRL") -editable true controlName;
+	}
+    else if (`size ($sel)` > 1)
+	{
+	if (`size($sel)` > 1)
+    textFieldGrp -e -text "Multiple objects - default naming" -editable false controlName;
+	}
+}
+
+
+global proc makeFKControls_withScale ()
+{
+    // by Jason Baskin
+    // jason@jasonbaskin.com
+        
+    // Creates FK Controls for one or more selected objects
+    // User may choose a custom control name if a single object is selected
+    // Multiple objects must belong to a hierarchy
+    // Controls will be created with the "_CTRL" suffix appended to the object name
+    // Control size can be modified using the slider
+    
+
+	if (`window -exists makeFKWindow`)
+	deleteUI makeFKWindow;
+
+	string $text;
+
+	$sel = `ls -sl`;
+	if (`size ($sel)` == 0)
+	    warning "Please select an object to control.";
+	else
+	{   	
+    	if (`size ($sel)` > 1)
+    	print "Multiple objects select - default naming";
+    	
+    	$text = $sel[0];
+    
+    	window -title "Make FK Controls" makeFKWindow;
+    	columnLayout -adj true makeFKColumn ;
+    
+    	floatSliderGrp 
+    	-label "Control Size" 
+    	-field true
+    	-cw 1  80
+    	-cw 2  40
+    	-cw 3 150
+        -minValue .1 
+    	-maxValue 50.0
+        -fieldMinValue .1 
+    	-fieldMaxValue 50
+        -value 1
+    	controlSize;
+    	
+    	colorIndexSliderGrp 
+    	-cw 1  80
+    	-cw 2  40
+    	-label "Control Color" 
+    	-min 0 
+    	-max 31 
+    	-value 1
+    	controlColor;
+    
+        textFieldGrp
+    	-cw 1  80
+    	-cw 2 200
+        -label "Control Name"
+        -text  ($text+"_CTRL")
+    	controlName;
+    
+    	button
+    	-label "> Reload Selection <"
+    	-command "reloadFKUI"
+    	reloadButton;
+    
+    	button
+    	-label "CREATE CONTROL"
+    	-command "makeFKTRS"
+    	createFKButton;
+    
+        
+    	showWindow makeFKWindow;
+    	window -edit -wh 310 120 makeFKWindow;
+    	
+    	if (`size($sel)` > 1)
+        textFieldGrp -e -text "Multiple objects - default naming" -editable false controlName;
+	}
+}
+makeFKControls;
+
