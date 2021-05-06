@@ -3,7 +3,6 @@
 #See PEP 8 styleguide for consistency
 
 
-
 import maya.cmds as cmds
 import maya.mel as mel
 import pymel.core as pm
@@ -44,7 +43,8 @@ def gui():
     cmds.docTag='Rigging'
     cmds.button(w=300,l='Create Quick FK Menu',c=nrhFk)
     cmds.button(w=300,l='Auto Rig Joint Chain w/ Pads',c=nrhAutoRig)
-    cmds.button(w=300,l='Create Hand Attriburtes on Selected Object',c=nrhHands)
+    cmds.button(w=300,l='Create Hand Attributes on Selected Object',c=nrhHands)
+    cmds.button(w=300, l='Create Face Attribtes', c=nrhFace)
     cmds.button(w=300,l='Close',c=nrhWin)
     cmds.showWindow()
 
@@ -57,12 +57,6 @@ def nrhJoint(*args):
     cmds.joint('joint1',e=True,zso=True,oj='xyz')
     cmds.joint(p=(4,0,0))
     cmds.joint('joint2',e=True,zso=True,oj='xyz')
-    '''
-    next project on this is learning how and utilizing the limitSwitch
-    commands to limit joint rotation on specific reigons
-    here:http://help.autodesk.com/view/MAYAUL/2019/ENU/index.html?contextId=COMMANDSPYTHON-INDEX
-   '''
-
 
 
 
@@ -217,6 +211,32 @@ def nrhHands(*args):
     ctrl.addAttr('Thumb_twist', k=1, min=-10, max=101)
     ctrl.addAttr('Thumb_spread', k=1, min=-10, max=10)
 
+def nrhMirrorBlend(*args):
+    mel.eval("source ntMBS;")
+    mel.eval("ntMBS;")
+
+def nrhFace(*args):
+    ctrl=pm.ls(sl=1)[0]
+
+    ctrl.addAttr('faceBlends', k=1, at='enum', en='----------:')
+    ctrl.addAttr('mouthAll', k=1, at='enum', en='-----:')
+    ctrl.addAttr('ltSmile', k=1, min=0, max=10)
+    ctrl.addAttr('rtSmile', k=1, min=0, max=10)
+    ctrl.addAttr('mouthSmile', k=1, min=0, max=10)
+    ctrl.addAttr('ltFrown', k=1, min=0, max=10)    
+    ctrl.addAttr('rtFouth', k=1, min=0, max=10)   
+    ctrl.addAttr('mouthFrown', k=1, min=0, max=10)
+    ctrl.addAttr('ltWide', k=1, min=0, max=10)
+    ctrl.addAttr('rtWide', k=1, min=0, max=10)
+    ctrl.addAttr('mouthWide', k=1, min=0, max=10)    
+    ctrl.addAttr('lips', k=1, min=0, max=10)
+    ctrl.addAttr('ouShape', k=1, min=0, max=10)
+    ctrl.addAttr('thShape', k=1, min=0, max=10)
+    ctrl.addAttr('mouthPurse', k=1, min=0, max=10)
+    ctrl.addAttr('eyes', k=1, at='enum', en='-----:')
+    ctrl.addAttr('blink', k=1, min=0, max=10)
+    ctrl.addAttr('ltBlink', k=1, min=0, max=10)
+    ctrl.addAttr('rtBlink', k=1, min=0, max=10)
 
 
 
@@ -227,9 +247,7 @@ thanks='Thank You'
 splash='Dialog'
 
 def nrhWin(*args):
-    if cmds.window('myUI',ex=True):
-        cmds.deleteUI('myUI')
-
+    cmds.deleteUI('myUI')
     cmds.window(thanks, w=800, h=350)
     cmds.columnLayout( adjustableColumn=True)
     cmds.text(label='Thanks for using my toolset')
