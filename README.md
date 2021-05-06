@@ -10,7 +10,9 @@ Now just highlight the code then middle mouse click and drag to your preffered t
 Example:
 
 import nrhTool
+
 reload(nrhTool)
+
 nrhTool.gui()
 
 
