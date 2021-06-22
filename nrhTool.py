@@ -11,40 +11,40 @@ def gui():
     if cmds.window(win,ex=True):
         cmds.deleteUI(win)
 
-    cmds.window(win, mm=True)
-    cmds.backgroundColor=(1.0, 0.0, 0.5)
-    cmds.docTag='Rigging'
+    cmds.window(win, mm=True, bgc=(1.0, 0.1, 0.1))
     cmds.columnLayout('Main', cal='left')
-    cmds.button(w=300,l='Create Square Icon',c=nrhSquare)
-    cmds.button(w=300,l='Custom Star Icon',c=nrhCustom)
-    cmds.button(w=300,l='Create Cube Icon',c=nrhCube)
-    cmds.button(w=300,l='Mirror Selected Joint',c=nrhMirrorjoint)
-    cmds.button(w=300,l='Create Control on Selected',c=create_icon)
+    cmds.button(w=300,ebg=True,bgc=(0, 0, 0), l='Create Square Icon',c=nrhSquare)
+    cmds.button(w=300,ebg=True,bgc=(0, 0, 0), l='Custom Star Icon',c=nrhCustom)
+    cmds.button(w=300,ebg=True,bgc=(0, 0, 0), l='Create Cube Icon',c=nrhCube)
+    cmds.button(w=300,ebg=True,bgc=(0, 0, 0),l='Mirror Selected Joint',c=nrhMirrorjoint)
+    cmds.button(w=300,ebg=True,bgc=(0, 0, 0),l='Create Control on Selected',c=create_icon)
     cmds.rowColumnLayout(nc=2)
-    cmds.button(w=150,l='Freeze Transforms',c=nrhFreeze)
-    cmds.button(w=150,l='Delete History',c=nrhHistory)
-    cmds.button(w=150,l='Center Pivot',c=nrhCenter)
-    cmds.button(w=150,l='Empty Group',c=nrhGroup)
+    cmds.button(w=150,ebg=True,bgc=(0, 1.0, 1.0),l='Freeze Transforms',c=nrhFreeze)
+    cmds.button(w=150,ebg=True,bgc=(0, 1.0, 1.0),l='Delete History',c=nrhHistory)
+    cmds.button(w=150,ebg=True,bgc=(0, 1.0, 1.0),l='Center Pivot',c=nrhCenter)
+    cmds.button(w=150,ebg=True,bgc=(0, 1.0, 1.0),l='Empty Group',c=nrhGroup)
     cmds.setParent('Main')
     cmds.rowColumnLayout(nc=2)
     global pre
     pre=cmds.textField(w=100)
-    cmds.button(w=100,l='Prefix',c=nrhPre)
+    cmds.button(w=100,ebg=True,bgc=(0, 0, 0), l='Prefix',c=nrhPre)
     global suf
     suf=cmds.textField(w=100)
-    cmds.button(w=100,l='Suffix',c=nrhSuf)
+    cmds.button(w=100,ebg=True,bgc=(0, 0, 0), l='Suffix',c=nrhSuf)
     global ren
     ren=cmds.textField(w=100)
-    cmds.button(w=100,l='Rename',c=nrhRen)
+    cmds.button(w=100,ebg=True,bgc=(0, 0, 0), l='Rename',c=nrhRen)
     cmds.setParent('Main')
     cmds.docTag='Rigging'
-    cmds.button(w=300,l='Quick arm system rig', c=nrhArm)
-    cmds.button(w=300,l='Complex Space Switching Quick Setup', c=nrhSwitch)
-    cmds.button(w=300,l='Create Quick FK Menu',c=nrhFk)
-    cmds.button(w=300,l='Auto Rig Joint Chain w/ Pads',c=nrhAutoRig)
-    cmds.button(w=300,l='Create Hand Attributes on Selected Object',c=nrhHands)
-    cmds.button(w=300,l='Create Face Attribtes', c=nrhFace)
-    cmds.button(w=300,l='Close',c=nrhWin)
+    cmds.button(w=300,ebg=True,bgc=(0.1, 0.4, 0.2),l='Quick arm system rig', c=nrhArm)
+    cmds.button(w=300,ebg=True,bgc=(0.1, 0.4, 0.2),l='Complex Space Switching Quick Setup', c=nrhSwitch)
+    cmds.button(w=300, ebg=True,bgc=(1,1,1), l='Ribbon Creation Tool', c=ribbonTool)
+    cmds.button(w=300,ebg=True,bgc=(0.1, 0.4, 0.2),l='Create Quick FK Menu',c=nrhFk)
+    cmds.button(w=300,ebg=True,bgc=(0.1, 0.4, 0.2),l='Auto Rig Joint Chain w/ Pads',c=nrhAutoRig)
+    cmds.button(w=300,ebg=True,bgc=(0.1, 0.4, 0.2),l='Create Hand Attributes on Selected Object',c=nrhHands)
+    cmds.button(w=300,ebg=True,bgc=(0.1, 0.4, 0.2),l='Create Face Attribtes', c=nrhFace)
+    cmds.columnLayout('End', cal='left')
+    cmds.button(w=300,ebg=True,bgc=(0, 0, 0),l='Close',c=nrhWin)
     cmds.showWindow()
 
 # gui button functions
@@ -164,6 +164,11 @@ def nrhSwitch(*args):
     import spaceswitchTool_setup
     reload(spaceswitchTool_setup)
 
+def ribbonTool(*args):
+    import ribbonTool
+    reload(ribbonTool)
+    ribbonTool.open_ribbon_ui()
+
 def nrhAutoRig(*args):
     joint_chain = pm.ls(sl=True, dag=True)
     last_icon = None
@@ -229,6 +234,8 @@ def nrhFace(*args):
     ctrl.addAttr('blink', k=1, min=0, max=10)
     ctrl.addAttr('ltBlink', k=1, min=0, max=10)
     ctrl.addAttr('rtBlink', k=1, min=0, max=10)
+
+thanks='Thank You'
 
 def nrhWin(*args):
     cmds.deleteUI('myUI')
