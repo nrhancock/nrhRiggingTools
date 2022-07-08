@@ -1,4 +1,4 @@
-global proc makeFKTRS ()
+global proc makeFKTR ()
 {
 	// sets up FK controls to a joint chain of any size
 	// usage: makeFKTRS (requires makeFK UI)
@@ -72,14 +72,8 @@ global proc makeFKTRS ()
 		setAttr ($controlName+".ry") 0;
 		setAttr ($controlName+".rz") 0;
 		
-		setAttr ($controlName+".sx") 1;
-		setAttr ($controlName+".sy") 1;
-		setAttr ($controlName+".sz") 1;
-		
 		// connecting FK controls directly to joint rotations
 		parentConstraint -mo $controlName ($selection[$i])  ;
-		scaleConstraint -mo $controlName ($selection[$i])  ;
-
 		
 		// point constrain the controller objects to the actual joints so that the move properly
 		// when joints scale/stretch
@@ -111,7 +105,7 @@ global proc reloadFKUI()
 }
 
 
-global proc makeFKControls_withScale ()
+global proc makeFKControls ()
 {
     // by Jason Baskin
     // jason@jasonbaskin.com
@@ -177,7 +171,7 @@ global proc makeFKControls_withScale ()
     
     	button
     	-label "CREATE CONTROL"
-    	-command "makeFKTRS"
+    	-command "makeFKTR"
     	createFKButton;
     
         
@@ -189,4 +183,3 @@ global proc makeFKControls_withScale ()
 	}
 }
 makeFKControls;
-
